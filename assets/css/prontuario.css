@@ -1,0 +1,616 @@
+/* ===================================================================
+   prontuario.css  —  O CSS NOSSO
+   Prontuário Eletrônico TDS
+
+   O template Sneat cuida do layout geral (menu, cards, botões).
+   Aqui fica só o que é do prontuário.
+
+   REGRA IMPORTANTE: nunca edite o arquivo assets/vendor/css/core.css.
+   Ele é do template, tem 585 KB e um dia pode ser atualizado — se você
+   mexer nele, perde o trabalho. Tudo o que quisermos mudar, mudamos
+   AQUI, redeclarando a variável depois. É assim que se personaliza um
+   template sem quebrá-lo.
+   =================================================================== */
+
+
+/* ===================================================================
+   1. A COR DO SISTEMA
+   O Sneat vem roxo (#696cff). O nosso verde é #0a7c74, o mesmo do
+   documento de escopo. Como o template guarda as cores em variáveis,
+   basta redeclarar aqui: botão, link, menu e foco ficam verdes juntos.
+   =================================================================== */
+:root {
+  --verde:        #0a7c74;
+  --verde-escuro: #05504f;
+  --verde-claro:  #e2f2f0;
+
+  --bs-primary:            #0a7c74;
+  --bs-primary-rgb:        10, 124, 116;
+  --bs-primary-bg-subtle:  #e2f2f0;
+  --bs-link-color:         #0a7c74;
+  --bs-link-hover-color:   #085f59;
+}
+
+.btn-primary {
+  --bs-btn-bg:                  #0a7c74;
+  --bs-btn-border-color:        #0a7c74;
+  --bs-btn-hover-bg:            #096f68;
+  --bs-btn-hover-border-color:  #086159;
+  --bs-btn-focus-shadow-rgb:    47, 144, 137;
+  --bs-btn-active-bg:           #096f68;
+  --bs-btn-active-border-color: #075048;
+  --bs-btn-disabled-bg:         #0a7c74;
+  --bs-btn-disabled-border-color: #0a7c74;
+}
+
+.btn-outline-primary {
+  --bs-btn-color:                 #0a7c74;
+  --bs-btn-border-color:          #0a7c74;
+  --bs-btn-hover-bg:              #0a7c74;
+  --bs-btn-hover-border-color:    #0a7c74;
+  --bs-btn-active-bg:             #0a7c74;
+  --bs-btn-active-border-color:   #0a7c74;
+  --bs-btn-disabled-color:        #0a7c74;
+  --bs-btn-disabled-border-color: #0a7c74;
+}
+
+.bg-label-primary {
+  background-color: #e2f2f0 !important;
+  color: #0a7c74 !important;
+}
+
+.progress-bar {
+  --bs-progress-bar-bg: #0a7c74;
+}
+
+
+/* ===================================================================
+   2. AJUSTES HERDADOS DO TEMPLATE
+   =================================================================== */
+.content-wrapper .navbar {
+  z-index: auto;
+}
+
+.menu .app-brand {
+  height: 64px;
+  margin-top: 12px;
+}
+
+
+/* ===================================================================
+   3. TELA DE LOGIN
+   Duas colunas: à esquerda a marca em verde, à direita o formulário.
+   No celular a coluna verde some e sobra só o formulário.
+   =================================================================== */
+.login-marca {
+  background: linear-gradient(160deg, #0a7c74 0%, #076765 55%, #05504f 100%);
+  color: #fff;
+}
+
+.login-marca h1 {
+  font-size: 1.9rem;
+  line-height: 1.2;
+  letter-spacing: -.02em;
+  max-width: 380px;
+}
+
+.login-marca p {
+  opacity: .85;
+  max-width: 350px;
+}
+
+.login-selo {
+  display: inline-block;
+  background: rgba(255, 255, 255, .14);
+  border: 1px solid rgba(255, 255, 255, .22);
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: .78rem;
+}
+
+.login-formulario {
+  max-width: 400px;
+}
+
+/* Rótulo pequeno em maiúsculas, como no protótipo */
+.rotulo-campo {
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #566a7f;
+  margin-bottom: 6px;
+}
+
+
+/* ===================================================================
+   4. REGRA DE OURO Nº 4 — alergia sempre em destaque
+   =================================================================== */
+.alerta-alergia {
+  background: #fdeceb;
+  border: 1px solid #f3c9c6;
+  color: #b3261e;
+  font-weight: 700;
+  border-radius: 9px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+/* Versão pequena, para caber dentro do cartão de leito do painel.
+   Repare que são DUAS classes no mesmo elemento: .alerta-alergia traz a
+   cor e a borda, .alerta-mini só reduz o tamanho. O alerta continua
+   sendo um só — não existe uma segunda cor de alergia no sistema, e
+   mudar a cor aqui muda em todas as telas de uma vez. */
+.alerta-alergia.alerta-mini {
+  padding: 5px 9px;
+  font-size: .76rem;
+  border-radius: 6px;
+  gap: 6px;
+}
+
+
+/* ===================================================================
+   5. Sinais vitais fora da faixa de referência (Módulo 3)
+   =================================================================== */
+.valor-alterado {
+  color: #b3261e;
+  font-weight: 700;
+}
+
+
+/* ===================================================================
+   6. Cores dos quatro perfis — as mesmas do documento de escopo
+   =================================================================== */
+.perfil-administrador { color: #6b3fa0; background: #f0eaf8; }
+.perfil-recepcao      { color: #9a6100; background: #fdf1de; }
+.perfil-medico        { color: #01417e; background: #e5edf7; }
+.perfil-tecnico       { color: #0a7c74; background: #e2f2f0; }
+
+.selo-perfil {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+
+/* ===================================================================
+   7. PAINEL DE LEITOS (Módulo 2)
+   Um cartão por cama. A cor da barra da esquerda diz a situação sem
+   precisar ler nada: verde ocupado, tracejado livre, apagado fora de uso.
+   =================================================================== */
+.leito-cartao {
+  background: #fff;
+  border: 1px solid #e4e6e8;
+  border-left: 4px solid #d9dee3;
+  border-radius: 10px;
+  padding: 13px 15px;
+
+  /* height 100% deixa todos os cartões da mesma linha com a mesma
+     altura, mesmo que um tenha alergia e o outro não. Funciona porque
+     a .row do Bootstrap já é flex e estica as colunas. */
+  height: 100%;
+}
+
+.leito-cartao.ocupado {
+  border-left-color: #0a7c74;
+}
+
+.leito-cartao.livre {
+  background: #fbfbfc;
+  border-style: dashed;
+  border-left-style: solid;
+}
+
+.leito-cartao.inativo {
+  background: #f4f4f5;
+  border-left-color: #a8adb2;
+  opacity: .65;
+}
+
+.leito-numero {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  line-height: 1;
+}
+
+.leito-paciente {
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.leito-cid {
+  font-size: .78rem;
+  line-height: 1.3;
+}
+
+/* A bolinha da legenda: a mesma cor da barra do cartão que ela explica */
+.legenda-ponto {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+
+/* ===================================================================
+   8. LINHA DO TEMPO DOS REGISTROS (Módulo 4)
+   A anotação de enfermagem e a evolução médica na mesma coluna, em
+   ordem de hora. A cor do ponto diz de quem é o registro — as mesmas
+   cores dos perfis da seção 6, para o verde do técnico e o azul do
+   médico significarem a mesma coisa em todo o sistema.
+   =================================================================== */
+.linha-tempo {
+  position: relative;
+  padding-left: 26px;
+}
+
+/* O fio vertical que liga os registros */
+.linha-tempo::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: #e4e6e8;
+}
+
+.registro-item {
+  position: relative;
+  padding-bottom: 22px;
+}
+
+.registro-item:last-child {
+  padding-bottom: 0;
+}
+
+/* O ponto. Fica em cima do fio, com borda branca para parecer furo */
+.registro-item::before {
+  content: '';
+  position: absolute;
+  left: -25px;
+  top: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: #a8adb2;
+}
+
+.registro-item.anotacao::before { background: #0a7c74; }
+.registro-item.evolucao::before { background: #01417e; }
+
+.registro-cabeca {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.registro-hora {
+  font-weight: 700;
+  font-size: .92rem;
+}
+
+/* O texto do registro. white-space guarda a quebra de linha que a
+   pessoa digitou: parágrafo de anotação clínica tem sentido, e um
+   texto todo grudado numa linha só é ilegível. */
+.registro-texto {
+  white-space: pre-line;
+  line-height: 1.55;
+  margin: 0;
+}
+
+
+/* ===================================================================
+   9. IMPRESSÃO (Módulo 6) — some com menu, barra e rodapé
+   =================================================================== */
+@media print {
+  #layout-menu,
+  #layout-navbar,
+  .content-footer,
+  .btn {
+    display: none !important;
+  }
+
+  .layout-page,
+  .content-wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .card {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+  }
+}
+
+/* ===================================================================
+   O CARTÃO DE LEITO COMO LINK  ·  Módulo 6
+   ===================================================================
+   No painel, o cartão de um leito OCUPADO é um <a> que leva à ficha do
+   paciente. Cama livre e leito fora de uso seguem sendo <div>.
+
+   Três coisas precisam ser desfeitas, porque o navegador trata <a> de
+   um jeito que não serve para um cartão:
+
+     display: block   um <a> é inline por natureza, e inline ignora o
+                      height: 100% que iguala a altura dos cartões.
+     color: inherit   senão o cartão inteiro fica azul de link.
+     text-decoration  senão tudo dentro dele vem sublinhado.
+
+   O que sobra é o comportamento que a gente quer: cursor de mão, foco
+   pelo teclado e o cartão inteiro como área de clique.
+   =================================================================== */
+.leito-cartao.leito-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+
+  /* A transição é curta de propósito: o painel tem catorze cartões, e
+     animação lenta em lista grande cansa quem passa o mouse. */
+  transition: border-color .12s, box-shadow .12s, transform .12s;
+}
+
+.leito-cartao.leito-link:hover {
+  border-left-color: #075c56;
+  box-shadow: 0 3px 10px rgba(16, 42, 40, .13);
+
+  /* Um pixel para cima. O suficiente para o cartão parecer que
+     respondeu, sem mexer o resto da grade de lugar. */
+  transform: translateY(-1px);
+}
+
+/* O mesmo destaque para quem chega pelo Tab em vez do mouse. O contorno
+   fica DENTRO da borda (outline-offset negativo) para não ser cortado
+   pelo canto arredondado. */
+.leito-cartao.leito-link:focus-visible {
+  outline: 2px solid #0a7c74;
+  outline-offset: -2px;
+}
+
+/* Na impressão o cartão não é mais um botão: nada de sombra nem
+   deslocamento no papel. */
+@media print {
+  .leito-cartao.leito-link {
+    box-shadow: none;
+    transform: none;
+  }
+}
+
+/* ===================================================================
+   10. A FICHA NO PAPEL (Módulo 6)
+   ===================================================================
+   O botão Imprimir não gera PDF nem chama biblioteca nenhuma: ele
+   chama window.print(), e é este bloco que decide como a folha sai.
+
+   O @media print do começo do arquivo já esconde menu, barra, rodapé e
+   .btn. Aqui vai o que é só da ficha.
+   =================================================================== */
+
+/* A tarja de treinamento. Fica invisível na tela (o `d-none` do
+   Bootstrap) e vira a primeira linha da folha (o `d-print-block`). */
+.tarja-treino {
+  border: 2px solid #000;
+  padding: 6px 10px;
+  margin-bottom: 12px;
+  font-size: 10pt;
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.tarja-quando {
+  display: block;
+  font-weight: 400;
+  font-size: 9pt;
+}
+
+@media print {
+
+  /* Preto no branco. Tinta colorida em impressora de escola é caro, e
+     o vermelho de valor alterado precisa continuar legível quando sai
+     em cinza — por isso ele vira NEGRITO E SUBLINHADO, não só cor. */
+  .valor-alterado {
+    color: #000 !important;
+    font-weight: 700;
+    text-decoration: underline;
+  }
+
+  /* O alerta de alergia é o que ninguém pode deixar de ver na folha.
+     Sem fundo colorido para depender de tinta: moldura grossa. */
+  .alerta-alergia {
+    background: none !important;
+    border: 2px solid #000 !important;
+    color: #000 !important;
+    font-weight: 700;
+  }
+
+  /* Um registro cortado no meio pela quebra de página é um registro que
+     alguém vai ler pela metade. `break-inside: avoid` empurra o bloco
+     inteiro para a folha seguinte quando ele não cabe. */
+  .registro-item,
+  .card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* A tabela de sinais vitais pode ser mais longa que a folha. Quando
+     ela quebra, o cabeçalho se repete no topo da página seguinte —
+     senão a segunda folha é uma parede de números sem rótulo. */
+  thead {
+    display: table-header-group;
+  }
+
+  /* Na tela a tabela rola de lado; no papel não existe rolagem, então
+     ela precisa poder ser mais estreita. */
+  .table-responsive {
+    overflow: visible !important;
+  }
+
+  .table {
+    font-size: 8.5pt;
+  }
+
+  /* O seletor de episódio é feito de .btn, que o print já esconde. A
+     identificação de qual internação está na folha fica no cabeçalho do
+     bloco 2, que sai impresso. */
+}
+
+/* ===================================================================
+   11. O LOGOTIPO PRONTUS
+   ===================================================================
+   Substitui o ícone de cruz do Boxicons que o projeto usava como
+   marca. Três lugares o mostram: o menu lateral, a marca de celular do
+   login e a coluna da esquerda do login.
+
+   A altura mora AQUI e não num atributo do <img> em cada tela. São
+   três telas: com o tamanho no HTML, mudar a marca exigiria três
+   edições e uma delas ficaria esquecida.
+
+   O arquivo servido tem 64px de lado para uma exibição de 30 — é o
+   dobro, para não ficar borrado em tela de alta densidade.
+   =================================================================== */
+.marca-prontus {
+  height: 30px;
+  width: auto;
+
+  /* O PNG tem fundo transparente, então ele assenta em qualquer cor de
+     menu — inclusive se a escola trocar o tema para escuro. */
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* NÃO existe regra de @media print para a marca, e é de propósito.
+   A marca do menu vive dentro do #layout-menu, que a impressão esconde
+   — então uma regra aqui seria código morto.
+   Quem identifica a folha impressa é a tarja de treinamento da ficha,
+   que diz mais do que um logotipo diria: que aquilo é exercício. */
+
+/* ===================================================================
+   12. A BARRA DE TÍTULO DE CADA TELA
+   ===================================================================
+   O sistema era branco e cinza do topo ao rodapé, com verde só na
+   marca, nos botões e no login. Esta barra passou a trazer o verde
+   para dentro — no mesmo degradê do login, mas na versão CLARA dele.
+
+   POR QUE A VERSÃO CLARA, E NÃO O VERDE CHEIO DO LOGIN
+
+   Esta barra aparece em cima de 25 telas, e três coisas dependem de
+   contraste nela:
+
+     o selo do perfil    âmbar recepção · verde técnico · azul médico
+     o avatar            a mesma cor do perfil
+     o alerta de alergia logo abaixo, em vermelho
+
+   Sobre verde escuro, âmbar e azul-escuro ficam ilegíveis: os quatro
+   perfis teriam que virar branco translúcido, e o sistema perderia a
+   leitura de "quem está logado" pela cor. E um verde saturado no topo
+   de toda tela disputaria atenção com o vermelho da alergia — que é o
+   único destaque que não pode perder força.
+
+   Com o verde claro, o selo e o avatar ficam como estavam.
+
+   A BORDA ESQUERDA
+
+   4 px, no verde cheio. É o que ancora a barra: só o degradê claro
+   quase não se percebe em monitor de laboratório com brilho baixo.
+
+   E o canto esquerdo vira QUADRADO. Borda de um lado só com canto
+   redondo deixa a faixa aparecendo em ponta — é a mesma regra das
+   caixas da documentação. O 0.375rem da direita é o valor do próprio
+   Sneat: arredondamento diferente do resto seria visível.
+   =================================================================== */
+#layout-navbar.navbar-detached {
+  background: linear-gradient(160deg, #e2f2f0 0%, #eef7f6 60%, #fbfdfd 100%);
+  border-left: 4px solid var(--verde);
+  border-radius: 0 0.375rem 0.375rem 0;
+}
+
+/* O título ganha o verde escuro do degradê, não o cinza-azulado do
+   template. O subtítulo acompanha, num tom mais fraco — ele é
+   informação secundária e continua parecendo secundária. */
+#layout-navbar h5 {
+  color: var(--verde-escuro);
+}
+
+/* O .text-body-secondary do Bootstrap é cinza. Sobre o verde claro ele
+   fica sem contraste, então aqui ele vira um verde apagado.
+   O seletor precisa do id para vencer a especificidade do template. */
+#layout-navbar .text-body-secondary {
+  color: #4a7d79 !important;
+}
+
+/* O botão que abre o menu no celular fica sobre o degradê. */
+#layout-navbar .layout-menu-toggle .bx {
+  color: var(--verde-escuro);
+}
+
+/* -------------------------------------------------------------------
+   O AVATAR: A COR DO PERFIL NUNCA CHEGAVA NELE
+
+   O `<span>` do avatar recebe a classe do perfil, igual ao selo. Mas a
+   cor não aparecia: o Sneat define `.avatar .avatar-initial` — DUAS
+   classes — e isso vence `.perfil-recepcao`, que tem uma só.
+   Especificidade não se resolve por ordem de carga: o `prontuario.css`
+   carrega depois e perdia mesmo assim.
+
+   O resultado era branco sobre #eeedf0, contraste de 1,17:1. As
+   iniciais estavam invisíveis em toda tela do sistema.
+
+   POR QUE COR CHEIA COM TEXTO BRANCO, E NÃO O MESMO DO SELO
+
+   Medido nos quatro perfis:
+
+                   cor sobre claro     branco sobre cor cheia
+     recepção          4,61:1                5,14:1
+     médico            8,64:1               10,20:1
+     técnico           4,39:1  ← reprova     5,06:1
+     administrador     6,27:1                7,38:1
+
+   O mínimo é 4,5:1. O técnico não passa na primeira forma, e é o
+   perfil mais usado do sistema. Na segunda, os quatro passam.
+   ------------------------------------------------------------------- */
+.avatar .avatar-initial.perfil-recepcao      { background: #9a6100; color: #fff; }
+.avatar .avatar-initial.perfil-medico        { background: #01417e; color: #fff; }
+.avatar .avatar-initial.perfil-tecnico       { background: #0a7c74; color: #fff; }
+.avatar .avatar-initial.perfil-administrador { background: #6b3fa0; color: #fff; }
+
+/* ===================================================================
+   13. O MENU DO AVATAR — dois contrastes do template
+
+   O menu ganhou a seção "Ver o sistema como", e ao medir apareceram
+   duas heranças do Sneat abaixo do mínimo. Nenhuma das duas é defeito
+   nosso — mas as duas ficam na nossa tela.
+
+   O seletor precisa das TRÊS classes para vencer o template. É a
+   mesma lição do avatar mais acima: ordem de carga não resolve
+   especificidade. O prontuario.css carrega depois e perderia igual.
+
+   Medido sobre o branco do menu:
+     .dropdown-header       era #a7acb2, 2,29:1   →  #4a7d79, 4,67:1
+     .dropdown-item.active  era #0a7c74, 4,07:1   →  #05504f, 7,44:1
+
+   No item ativo o fundo é rgba(10,124,116,.16) — semitransparente.
+   A conta tem que ser feita sobre a cor COMPOSTA com o branco,
+   rgb(216,234,233), não sobre o rgba declarado. Medir contra o rgba
+   dá 1:1 e parece que está tudo bem.
+   =================================================================== */
+.dropdown-user .dropdown-menu .dropdown-header {
+  color: #4a7d79;
+}
+
+.dropdown-user .dropdown-menu .dropdown-item.active {
+  color: var(--verde-escuro);
+}
