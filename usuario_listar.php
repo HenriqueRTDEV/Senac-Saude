@@ -7,24 +7,47 @@
 // ===================================================================
 
 // A tranca vem sempre primeiro, antes de qualquer outra coisa.
-
+require 'includes/protege.php';
 
 // E logo depois, quem pode abrir esta tela.
 // Esconder o item no menu não basta: sem estas duas linhas, qualquer
 // pessoa logada abre esta página digitando o endereço no navegador.
 
+require 'includes/permissao.php';
+exigirPerfil (array('administrador'));
 
+require 'includes/perfis.php';
+require 'config/conexao.php';
 // -------------------------------------------------------------------
 //  A BUSCA
 //  Se o formulário não foi usado, $busca fica vazio.
 // -------------------------------------------------------------------
-
+$busca = '';
+if(isset($_GET['busca'])){
+  $busca = trim($_GET['busca']);
+}
 
 // O % é o curinga do LIKE: quer dizer "qualquer coisa aqui".
 // Repare no truque: se a busca está vazia, o curinga vira '%%',
 // que casa com tudo. Assim uma consulta só serve para os dois casos
 // e não precisamos de um if em volta do SQL.
+$curinga = '%' . $busca . '%';
 
+$sql = "SELECT id, nome, login, perfil, registro_profissional, ativo
+        FROM usuarios
+        WHERE nome LIKE ? OR login LIKE ?
+        ORDER BY ativo DESC, nome";
+
+        $stmt = mysqli_prepare($conexao, $sql);  // 1. Prepara
+        mysqli_stmt_bind_param($stmt, 'ss', $curinga, $curinga);  // 2. Amarra
+        mysqli_stmt_execute($stmt); // 3. Executa
+        $resultado = mysqli_stmt_get_result($stmt);  //4. Lê
+
+        $quantos = mysqli_num_rows($resultado);
+
+        $titulo = 'Usuários';
+        $subtitulo = 'Quem tem acesso ao sistema';
+        require 'includes/cabecalho.php';
 ?>
 
 <?php
@@ -32,22 +55,47 @@
 //  MENSAGENS
 //  As outras páginas voltam para cá com ?ok=... ou ?erro=...
 // -------------------------------------------------------------------
+$avisos_ok = array(
+  'criado'  => 'Usuário cadastrado com sucesso.',
+  'atualizado'  => 'Dados do usuário atualizados.',
+  'senha'       => 'Senha Redefinida',
+  'desativado'  => 'Usuário desativado. Ele continua no sistema, mas não loga mais.',
+  'reativado'   => 'Usuário reativado.'
+);
 
+$avisos_erro = array(
+    'login_repetido' => 'Já existe um usuário com esse login. Escolha outro.',
+    'campos'         => 'Preencha todos os campos obrigatórios.',
+    'nao_encontrado' => 'Usuário não encontrado.',
+    'auto_desativar' => 'Você não pode desativar a si mesmo — ficaria sem acesso ao sistema.',
+    'perfil_invalido'=> 'Perfil inválido.'
+);
 
-
-
+if(isset($_GET['ok']) && isset($avisos_ok[$_GET['ok']])){
 ?>
- 
+<div class="alert alert-success d-flex align-items-center" role="alert">
+    <i class="icon-base bx bx-check-circle me-2"></i>
+    <div><?php echo $avisos_ok[$_GET['ok']]; ?></div>
+  </div>
 <?php
+}
 
+if (isset($_GET['erro']) && isset($avisos_erro[$_GET['erro']])) {
+?>
+  <div class="alert alert-danger d-flex align-items-center" role="alert">
+    <i class="icon-base bx bx-error-circle me-2"></i>
+    <div><?php echo $avisos_erro[$_GET['erro']]; ?></div>
+  </div>
+<?php
+}
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
   <div>
     <h5 class="mb-0">Usuários cadastrados</h5>
     <small class="text-body-secondary">
-      <?php ?>
-      <?php ?>
+      <?php echo $quantos; ?> 
+      <?php echo ($quantos == 1 ? 'usuario encontrado' : 'usuarios encontrados'); ?>.
     </small>
   </div>
   <a href="usuario_form.php" class="btn btn-primary">
@@ -64,11 +112,12 @@
       name="busca"
       class="form-control"
       placeholder="Buscar por nome ou login…"
-      value="<?php ?>">
+      value="<?php echo htmlspecialchars($busca);?>"
+    >
     <button class="btn btn-outline-primary" type="submit">Buscar</button>
-    <?php  ?>
+    <?php if ($busca != '') { ?>
       <a href="usuario_listar.php" class="btn btn-outline-secondary">Limpar</a>
-    <?php  ?>
+    <?php } ?>
   </div>
 </form>
 
@@ -88,7 +137,7 @@
       <tbody>
 
       <?php
-      
+      if ($busca ==0){
       ?>
         <tr>
           <td colspan="6" class="text-center text-body-secondary py-4">
@@ -96,6 +145,7 @@
           </td>
         </tr>
       <?php
+      }
       
 
       // O laço: repete uma vez para CADA linha que veio do banco.
