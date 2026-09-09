@@ -123,7 +123,6 @@ $leitos_livres = $resumo['leitos_ativos'] - $resumo['leitos_ocupados'];
 $taxa = 0;
 if ($resumo['leitos_ativos'] > 0) {
     $taxa = round($resumo['leitos_ocupados'] * 100 / $resumo['leitos_ativos']);
-    
 }
 
 // -------------------------------------------------------------------

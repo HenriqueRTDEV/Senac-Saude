@@ -14,8 +14,6 @@ $deu_erro = isset($_GET['erro']);
 
 // Se o usuário acabou de sair, volta para cá com ?saiu=1
 $acabou_de_sair = isset($_GET['saiu']);
-
-
 ?>
 <!doctype html>
 <html lang="pt-BR">
@@ -89,20 +87,19 @@ $acabou_de_sair = isset($_GET['saiu']);
           Use o login e a senha cadastrados pelo administrador.
         </p>
 
-        <?php if ($deu_erro) { ?>
-          <div class="alert alert-danger" role="alert">
-            Usuário ou senha incorretos.
-          </div>
-      <?php } ?>
-        
-      <?php if ($acabou_de_sair) { ?>
-          <div class="alert alert-success" d-flex aling-itens-center role="alert">
-            i class="icon-base bx bx-log-out me-2"></i>
-            <div>Você saiu do sistema com segurança.</div>
+        <?php if($deu_erro){ ?>
+        <div class="alert alert-danger d-flex aling-itens-center" role="alert">
+          <i class="icon-base bx bx-error-circle me-2"></i>
+          <div>Usuário ou senha incorretos.</div>
         </div>
         <?php } ?>
-        
 
+        <?php if($acabou_de_sair){ ?>
+        <div class="alert alert-success d-flex aling-itens-center" role="alert">
+          <i class="icon-base bx bx-check-circle me-2"></i>
+          <div>Você saiu do sistema com segurança.</div>
+        </div>
+        <?php } ?>
         <form action="autenticar.php" method="post">
 
           <div class="mb-3">

@@ -12,19 +12,19 @@ require 'includes/protege.php';
 // E logo depois, quem pode abrir esta tela.
 // Esconder o item no menu não basta: sem estas duas linhas, qualquer
 // pessoa logada abre esta página digitando o endereço no navegador.
-
 require 'includes/permissao.php';
-exigirPerfil (array('administrador'));
+exigirPerfil(array('administrador'));
 
 require 'includes/perfis.php';
 require 'config/conexao.php';
+
 // -------------------------------------------------------------------
 //  A BUSCA
 //  Se o formulário não foi usado, $busca fica vazio.
 // -------------------------------------------------------------------
 $busca = '';
-if(isset($_GET['busca'])){
-  $busca = trim($_GET['busca']);
+if (isset($_GET['busca'])) {
+    $busca = trim($_GET['busca']);
 }
 
 // O % é o curinga do LIKE: quer dizer "qualquer coisa aqui".
@@ -38,16 +38,16 @@ $sql = "SELECT id, nome, login, perfil, registro_profissional, ativo
         WHERE nome LIKE ? OR login LIKE ?
         ORDER BY ativo DESC, nome";
 
-        $stmt = mysqli_prepare($conexao, $sql);  // 1. Prepara
-        mysqli_stmt_bind_param($stmt, 'ss', $curinga, $curinga);  // 2. Amarra
-        mysqli_stmt_execute($stmt); // 3. Executa
-        $resultado = mysqli_stmt_get_result($stmt);  //4. Lê
+$stmt = mysqli_prepare($conexao, $sql);              // 1. prepara
+mysqli_stmt_bind_param($stmt, 'ss', $curinga, $curinga);  // 2. amarra
+mysqli_stmt_execute($stmt);                          // 3. executa
+$resultado = mysqli_stmt_get_result($stmt);          // 4. lê
 
-        $quantos = mysqli_num_rows($resultado);
+$quantos = mysqli_num_rows($resultado);
 
-        $titulo = 'Usuários';
-        $subtitulo = 'Quem tem acesso ao sistema';
-        require 'includes/cabecalho.php';
+$titulo    = 'Usuários';
+$subtitulo = 'Quem tem acesso ao sistema';
+require 'includes/cabecalho.php';
 ?>
 
 <?php
@@ -56,11 +56,11 @@ $sql = "SELECT id, nome, login, perfil, registro_profissional, ativo
 //  As outras páginas voltam para cá com ?ok=... ou ?erro=...
 // -------------------------------------------------------------------
 $avisos_ok = array(
-  'criado'  => 'Usuário cadastrado com sucesso.',
-  'atualizado'  => 'Dados do usuário atualizados.',
-  'senha'       => 'Senha Redefinida',
-  'desativado'  => 'Usuário desativado. Ele continua no sistema, mas não loga mais.',
-  'reativado'   => 'Usuário reativado.'
+    'criado'      => 'Usuário cadastrado com sucesso.',
+    'atualizado'  => 'Dados do usuário atualizados.',
+    'senha'       => 'Senha redefinida.',
+    'desativado'  => 'Usuário desativado. Ele continua no sistema, mas não entra mais.',
+    'reativado'   => 'Usuário reativado.'
 );
 
 $avisos_erro = array(
@@ -71,9 +71,9 @@ $avisos_erro = array(
     'perfil_invalido'=> 'Perfil inválido.'
 );
 
-if(isset($_GET['ok']) && isset($avisos_ok[$_GET['ok']])){
+if (isset($_GET['ok']) && isset($avisos_ok[$_GET['ok']])) {
 ?>
-<div class="alert alert-success d-flex align-items-center" role="alert">
+  <div class="alert alert-success d-flex align-items-center" role="alert">
     <i class="icon-base bx bx-check-circle me-2"></i>
     <div><?php echo $avisos_ok[$_GET['ok']]; ?></div>
   </div>
@@ -94,8 +94,8 @@ if (isset($_GET['erro']) && isset($avisos_erro[$_GET['erro']])) {
   <div>
     <h5 class="mb-0">Usuários cadastrados</h5>
     <small class="text-body-secondary">
-      <?php echo $quantos; ?> 
-      <?php echo ($quantos == 1 ? 'usuario encontrado' : 'usuarios encontrados'); ?>.
+      <?php echo $quantos; ?>
+      <?php echo ($quantos == 1 ? 'usuário encontrado' : 'usuários encontrados'); ?>
     </small>
   </div>
   <a href="usuario_form.php" class="btn btn-primary">
@@ -112,8 +112,7 @@ if (isset($_GET['erro']) && isset($avisos_erro[$_GET['erro']])) {
       name="busca"
       class="form-control"
       placeholder="Buscar por nome ou login…"
-      value="<?php echo htmlspecialchars($busca);?>"
-    >
+      value="<?php echo htmlspecialchars($busca); ?>">
     <button class="btn btn-outline-primary" type="submit">Buscar</button>
     <?php if ($busca != '') { ?>
       <a href="usuario_listar.php" class="btn btn-outline-secondary">Limpar</a>
@@ -137,7 +136,7 @@ if (isset($_GET['erro']) && isset($avisos_erro[$_GET['erro']])) {
       <tbody>
 
       <?php
-      if ($busca ==0){
+      if ($quantos == 0) {
       ?>
         <tr>
           <td colspan="6" class="text-center text-body-secondary py-4">
@@ -146,7 +145,6 @@ if (isset($_GET['erro']) && isset($avisos_erro[$_GET['erro']])) {
         </tr>
       <?php
       }
-      
 
       // O laço: repete uma vez para CADA linha que veio do banco.
       while ($u = mysqli_fetch_assoc($resultado)) {

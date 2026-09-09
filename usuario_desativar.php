@@ -21,15 +21,18 @@
 
 require 'includes/protege.php';
 require 'includes/permissao.php';
-exigirPerfil (array('administrador'));
+exigirPerfil(array('administrador'));
+require 'includes/perfis.php';
 require 'config/conexao.php';
 
+// (int) força virar número. Se vier lixo na URL, vira 0
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
-if ($id === 0) {
-  header('Location: usuario_listar.php?erro=nao_encontrado');
-  exit;
+if($id == 0){
+    header('Location: usuario_listar.php?erro=nao_encontrado');
+    exit;
 }
+
 
 // -------------------------------------------------------------------
 //  REGRA: ninguém desativa a si mesmo.
@@ -40,15 +43,38 @@ if ($id === 0) {
 //  enfeite: basta digitar o endereço com o id certo. A verificação
 //  que vale é esta.
 // -------------------------------------------------------------------
-
+if($id == $_SESSION['usuario_id']){
+    header('Location: usuario_listar.php?erro=auto_desativar');
+    exit;
+}
 
 // Descobre a situação atual para saber para que lado virar a chave.
-if ($id == $_SESSION['usuario_id']) {
-  header('Location: usuario_listar.php?erro=nao_encontrado');
-  exit;
+$sql = "SELECT ativo FROM usuarios WHERE = ?";
+$stmt = mysqli_prepare($conexao, $sql);
+mysqli_stmt_bind_param($stmt, 'i', $id);
+mysqli_stmt_execute($stmt);
+$resultado = mysqli_stmt_get_result($stmt);
+$usuario = mysqli_fetch_assoc($resultado);
+mysqli_stmt_close($stmt);
+
+if(!$usuario){
+    header('Location: usuario_listar.php?erro=nao_encontrado');
+    exit;
 }
 
 // Estava ativo? Vira inativo. Estava inativo? Vira ativo.
+$novo_valor = ($usuario['ativo'] ? 0 : 1);
 
+$stmt = mysqli_prepare($conexao, $sql);
+mysqli_stmt_bind_param($stmt, 'ii', $novo_valor, $id);
+mysqli_stmt_execute($stmt);
+mysqli_stmt_close($stmt);
+
+mysqli_close($conexao);
+
+$aviso = ($novo_valor == 0 ? 'desativado' : 'reativado');
+
+header('Location: usuario_listar.php?ok=' . $aviso);
+exit;
 
 
