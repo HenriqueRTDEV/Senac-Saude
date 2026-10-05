@@ -18,11 +18,16 @@
 // ===================================================================
 
 // Se a página não definiu um título, usa um padrão.
-
+if (!isset($titulo)) {
+    $titulo = 'Prontuário TDS';
+}
+if (!isset($subtitulo)) {
+    $subtitulo = '';
+}
 
 // Descobre qual arquivo está aberto agora (ex.: "painel.php").
 // Serve para deixar aceso o item certo do menu lateral.
-
+$pagina_atual = basename($_SERVER['PHP_SELF']);
 
 // -------------------------------------------------------------------
 //  QUEM ESTÁ LOGADO
@@ -33,7 +38,8 @@ $usuario_perfil = $_SESSION['usuario_perfil'];
 
 // O banco guarda o perfil sem acento e em minúsculas ('recepcao').
 // Na tela queremos a versão bonita. A tradução mora em um arquivo só.
-
+require_once 'includes/perfis.php';
+$perfil_na_tela = nomeDoPerfil($usuario_perfil);
 
 // -------------------------------------------------------------------
 //  O PAPEL EMPRESTADO
@@ -53,15 +59,18 @@ $usuario_perfil = $_SESSION['usuario_perfil'];
 //  cobre quem já estava logado quando esta parte passou a existir: a
 //  sessão dessa pessoa ainda não tem a chave nova.
 // -------------------------------------------------------------------
+require_once 'config/papel.php';
 
+$usuario_perfil_real = (isset($_SESSION['usuario_perfil_real'])
+                        ? $_SESSION['usuario_perfil_real']
+                        : $usuario_perfil);
 
-
-
-
+$pode_assumir_papel = (ADMIN_TROCA_PAPEL
+                       && $usuario_perfil_real == 'administrador');
 
 // Está com um papel emprestado agora? Serve para o menu do avatar
 // dizer a verdade sem repetir a comparação em três lugares.
-
+$papel_emprestado = ($usuario_perfil != $usuario_perfil_real);
 
 // Iniciais para o avatar: primeira letra das duas primeiras palavras,
 // pulando abreviações como "Dr." e "Téc." e apelidos entre parênteses.
@@ -72,7 +81,25 @@ $usuario_perfil = $_SESSION['usuario_perfil'];
 // meio, mandando lixo para a tela. O /u faz o PHP contar letras em vez
 // de bytes — e, ao contrário das funções mb_, não exige nenhuma
 // extensão instalada, então funciona em qualquer PHP.
+$iniciais = '';
+$quantas  = 0;
 
+foreach (explode(' ', $usuario_nome) as $pedaco) {
+
+    // pula "Dr.", "Téc." e "(TI)"
+    if ($pedaco == '' || strpos($pedaco, '.') !== false || strpos($pedaco, '(') !== false) {
+        continue;
+    }
+
+    if (preg_match('/^./u', $pedaco, $achado)) {
+        $iniciais = $iniciais . strtoupper($achado[0]);
+        $quantas  = $quantas + 1;
+    }
+
+    if ($quantas == 2) {
+        break;
+    }
+}
 ?>
 <!doctype html>
 <html
@@ -167,7 +194,7 @@ $usuario_perfil = $_SESSION['usuario_perfil'];
         </li>
 
         <!-- Painel de leitos: todos os perfis -->
-        <li class="menu-item ">
+        <li class="menu-item <?php if ($pagina_atual == 'painel.php') { echo 'active'; } ?>">
           <a href="painel.php" class="menu-link">
             <i class="menu-icon tf-icons bx bx-bed"></i>
             <div class="text-truncate">Painel de leitos</div>
@@ -183,20 +210,20 @@ $usuario_perfil = $_SESSION['usuario_perfil'];
         </li>
 
         <!-- Movimentação e leitos: só a recepção -->
-        <?php ?>
+        <?php if ($usuario_perfil == 'recepcao') { ?>
           <li class="menu-item <?php if ($pagina_atual == 'internacao_movimentar.php') { echo 'active'; } ?>">
             <a href="internacao_movimentar.php" class="menu-link">
               <i class="menu-icon tf-icons bx bx-transfer"></i>
               <div class="text-truncate">Movimentação</div>
             </a>
           </li>
-          <li class="menu-item <?php  ?>">
+          <li class="menu-item <?php if ($pagina_atual == 'leito_listar.php' || $pagina_atual == 'leito_form.php') { echo 'active'; } ?>">
             <a href="leito_listar.php" class="menu-link">
               <i class="menu-icon tf-icons bx bx-grid-alt"></i>
               <div class="text-truncate">Leitos</div>
             </a>
           </li>
-        <?php  ?>
+        <?php } ?>
 
         <!-- Sinais vitais: TODOS MENOS A RECEPÇÃO.
              É a linha mais importante da matriz de permissões do
@@ -204,14 +231,14 @@ $usuario_perfil = $_SESSION['usuario_perfil'];
              mas não vê um dado clínico dele. Acesso mínimo necessário,
              que a LGPD exige de sistema de saúde.
              Só o técnico afere; médico e administrador leem. -->
-        <?php ?>
+        <?php if ($usuario_perfil != 'recepcao') { ?>
           <li class="menu-item <?php if ($pagina_atual == 'sinal_listar.php' || $pagina_atual == 'sinal_form.php' || $pagina_atual == 'sinal_historico.php') { echo 'active'; } ?>">
             <a href="sinal_listar.php" class="menu-link">
               <i class="menu-icon tf-icons bx bx-pulse"></i>
               <div class="text-truncate">Sinais vitais</div>
             </a>
           </li>
-        <?php ?>
+        <?php } ?>
 
         <!-- Registros: também todos menos a recepção.
              Mas ESCREVER é só de dois: o técnico escreve anotação de
@@ -259,11 +286,12 @@ $usuario_perfil = $_SESSION['usuario_perfil'];
              O menu-toggle e o menu-sub são do próprio Sneat; a única
              coisa nossa é abrir o submenu quando uma das duas telas
              está aberta. -->
-        <?php  ?>
+        <?php if ($usuario_perfil == 'tecnico') { ?>
           <?php
           // As duas telas do submenu. Se estamos numa delas, o pai
           // fica aceso e o submenu já abre.
-      
+          $telas_medicacao = array('medicacao_turno.php', 'medicacao_historico.php');
+          $no_medicacao = in_array($pagina_atual, $telas_medicacao);
 
           // Quantas doses estão atrasadas agora. O número aparece no
           // menu para o técnico saber que tem coisa vencida sem
@@ -272,19 +300,36 @@ $usuario_perfil = $_SESSION['usuario_perfil'];
           // A consulta mora aqui porque o cabeçalho é a única parte do
           // sistema que aparece em toda página — e o aviso só serve se
           // aparecer em todas.
-          
+          $atrasadas_no_menu = 0;
 
-          
+          if (isset($conexao)) {
+
+              $sql_atraso = "SELECT COUNT(*) AS quantas
+                             FROM administracoes a
+                             JOIN prescricoes  pr ON pr.id = a.prescricao_id AND pr.ativo = 1
+                             JOIN internacoes  i  ON i.id = pr.internacao_id
+                                                 AND i.situacao = 'internado'
+                                                 AND i.ativo = 1
+                             WHERE a.status = 'pendente'
+                               AND a.horario_previsto < NOW()";
+
+              $res_atraso = mysqli_query($conexao, $sql_atraso);
+
+              if ($res_atraso) {
+                  $linha_atraso = mysqli_fetch_assoc($res_atraso);
+                  $atrasadas_no_menu = (int) $linha_atraso['quantas'];
+              }
+          }
           ?>
           <li class="menu-item <?php if ($no_medicacao) { echo 'active open'; } ?>">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
               <i class="menu-icon tf-icons bx bx-list-check"></i>
               <div class="text-truncate">Medicações</div>
-              <?php ?>
+              <?php if ($atrasadas_no_menu > 0) { ?>
                 <span class="badge bg-label-danger rounded-pill ms-auto">
-                  <?php ?>
+                  <?php echo $atrasadas_no_menu; ?>
                 </span>
-              <?php  ?>
+              <?php } ?>
             </a>
 
             <ul class="menu-sub">
@@ -300,7 +345,7 @@ $usuario_perfil = $_SESSION['usuario_perfil'];
               </li>
             </ul>
           </li>
-        <?php ?>
+        <?php } ?>
 
         <!-- Administração: só o administrador -->
         <?php if ($usuario_perfil == 'administrador') { ?>
@@ -356,7 +401,7 @@ $usuario_perfil = $_SESSION['usuario_perfil'];
 
             <li class="nav-item me-3 d-none d-md-block">
               <span class="selo-perfil perfil-<?php echo $usuario_perfil; ?>">
-                <?php ?>
+                <?php echo $perfil_na_tela; ?>
               </span>
             </li>
 
@@ -364,7 +409,7 @@ $usuario_perfil = $_SESSION['usuario_perfil'];
               <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
                 <div class="avatar">
                   <span class="avatar-initial rounded-circle perfil-<?php echo $usuario_perfil; ?>">
-                    <?php  ?>
+                    <?php echo $iniciais; ?>
                   </span>
                 </div>
               </a>

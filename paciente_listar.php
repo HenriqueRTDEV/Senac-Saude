@@ -16,17 +16,34 @@
 
 require 'includes/protege.php';
 require 'config/conexao.php';
+require 'includes/alergia.php';
 
+$eh_recepcao = ($_SESSION['usuario_perfil'] == 'recepcao');
 
 // -------------------------------------------------------------------
 //  BUSCA E FILTRO
 // -------------------------------------------------------------------
+$busca = '';
+if (isset($_GET['busca'])) {
+    $busca = trim($_GET['busca']);
+}
 
+$situacao = 'internado';
+if (isset($_GET['situacao'])) {
+    $situacao = $_GET['situacao'];
+}
 
 // O filtro entra no meio do SQL, então ele NÃO pode vir solto do
 // navegador. Passa antes por esta lista de valores permitidos —
 // qualquer outra coisa é ignorada.
-
+$condicao = '';
+if ($situacao == 'internado') {
+    $condicao = 'AND i.id IS NOT NULL';
+} else if ($situacao == 'nao_internado') {
+    $condicao = 'AND i.id IS NULL';
+} else {
+    $situacao = 'todos';
+}
 
 $curinga = '%' . $busca . '%';
 
@@ -39,14 +56,23 @@ $curinga = '%' . $busca . '%';
 //  WHERE, todo paciente não internado sumiria da lista — e é
 //  justamente ele que a recepção precisa achar para reinternar.
 // -------------------------------------------------------------------
-$sql = "select p.id, p.nome, p.data_nascimento, p.sexo, p.alergias, p.ativo,
-               i.id as internacao_id, i.data_admissao, i.diagnostico,
-               l.numero as leito, l.setor
-        from pacientes p
-        left join internacoes i on (i.paciente_id = p.id and i.data_alta is null)
-        left join leitos l on (l.id = i.leito_id)
-        where p.nome like ?
-        order by p.ativo desc, p.nome";
+$sql = "SELECT p.id, p.nome, p.ativo,
+               COALESCE(p.alergias, '') AS alergias,
+               TIMESTAMPDIFF(YEAR, p.data_nascimento, CURDATE()) AS idade,
+               i.id AS internacao_id, i.data_admissao,
+               l.identificacao AS leito,
+               COALESCE(s.nome, '') AS setor,
+               COALESCE(c.descricao, '') AS diagnostico
+        FROM pacientes p
+        LEFT JOIN internacoes i
+               ON i.paciente_id = p.id
+              AND i.situacao = 'internado'
+              AND i.ativo = 1
+        LEFT JOIN leitos  l ON l.id = i.leito_id
+        LEFT JOIN setores s ON s.id = l.setor_id
+        LEFT JOIN cids    c ON c.id = i.cid_id
+        WHERE p.nome LIKE ? $condicao
+        ORDER BY p.ativo DESC, l.identificacao, p.nome";
 
 $stmt = mysqli_prepare($conexao, $sql);
 mysqli_stmt_bind_param($stmt, 's', $curinga);
@@ -65,7 +91,7 @@ $avisos_ok = array(
     'cadastrado' => 'Paciente cadastrado. Para interná-lo, use a tela de Movimentação.',
     'atualizado' => 'Cadastro do paciente atualizado.',
     'inativado'  => 'Cadastro inativado. O paciente continua no banco, com todo o histórico.',
-    'reativado'  => 'Cadastro reativado.'
+    'reativado'  => 'Cadastro reativado com sucesso.'
 );
 
 $avisos_erro = array(
@@ -105,7 +131,7 @@ if (isset($_GET['erro']) && isset($avisos_erro[$_GET['erro']])) {
     </small>
   </div>
 
-  <?php  ?>
+  <?php if ($eh_recepcao) { ?>
     <div class="d-flex gap-2">
       <a href="internacao_movimentar.php" class="btn btn-outline-primary">
         <i class="icon-base bx bx-transfer me-1"></i> Movimentação
@@ -114,7 +140,7 @@ if (isset($_GET['erro']) && isset($avisos_erro[$_GET['erro']])) {
         <i class="icon-base bx bx-plus me-1"></i> Cadastrar paciente
       </a>
     </div>
-  <?php  ?>
+  <?php } ?>
 </div>
 
 <form method="get" action="paciente_listar.php" class="mb-4">
@@ -126,9 +152,9 @@ if (isset($_GET['erro']) && isset($avisos_erro[$_GET['erro']])) {
     </div>
     <div class="col-md-3">
       <select name="situacao" class="form-select">
-        <option value="internado"     <?php  ?>>Internados agora</option>
-        <option value="nao_internado" <?php  ?>>Não internados</option>
-        <option value="todos"         <?php ?>>Todos</option>
+        <option value="internado"     <?php if ($situacao == 'internado')     { echo 'selected'; } ?>>Internados agora</option>
+        <option value="nao_internado" <?php if ($situacao == 'nao_internado') { echo 'selected'; } ?>>Não internados</option>
+        <option value="todos"         <?php if ($situacao == 'todos')         { echo 'selected'; } ?>>Todos</option>
       </select>
     </div>
     <div class="col-md-2">

@@ -19,7 +19,7 @@
 
 require 'includes/protege.php';
 require 'config/conexao.php';
-//require 'includes/alergia.php';
+require 'includes/alergia.php';
 
 // -------------------------------------------------------------------
 //  OS DOIS FILTROS
