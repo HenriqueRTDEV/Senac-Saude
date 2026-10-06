@@ -3,6 +3,7 @@
 
 // Passo 1 - Conectar no Banco
 require 'config/conexao.php';
+require 'includes/funcoes2.php'; // para usar nomeDoSexo() e listaDeSexos()
 
 // Passo 2 - Escrever a Consulta que vai buscar no banco os pacientes
 // O Texto da consulta fica guardada na variavel, para ser usada depois
@@ -87,6 +88,7 @@ if(isset($_GET['erro']) && isset($frases[$_GET['erro']])){
         <th>ID</th>
         <th>Nome</th> <!-- Significa Table header, célula do cabeçalho -->
         <th>Nascimento</th>
+        <th>Idade</th>
         <th>Sexo</th>
         <th>Ativo</th>
         <th>Ações</th>
@@ -107,8 +109,9 @@ while ($p = mysqli_fetch_assoc($resultado)){
     se alguem cadastrar um nome com sinal de menor (<b>), sem ele o 
         navegador tentaria entender aquilo como tag HTML -->
     <td><?php echo htmlspecialchars($p['nome']); ?></td>
-    <td><?php echo $p['data_nascimento']; ?></td>
-    <td><?php echo $p['sexo']; ?></td>
+    <td><?php echo dataNaTela($p['data_nascimento']); ?></td>
+    <td><?php echo calcularIdade($p['data_nascimento']); ?></td>
+    <td><?php echo htmlspecialchars(nomeDoSexo($p['sexo'])); ?></td>
     <td><?php echo ($p['ativo'] == 1 ? 'Sim' : 'Não'); ?></td>
     <td>
         <a href="paciente_form2.php?id=<?php echo $p['id']; ?>">Editar</a>
